@@ -1,0 +1,28 @@
+{
+	"name": "mem",
+	"version": "0.0.1",
+	"description": "Pair-matching puzzle game.",
+	"main": "index.js",
+	"scripts": {
+		"start": "ts-node index"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/geon/mem.git"
+	},
+	"author": "Victor Widell <victor@topmost.se> (http://geon.github.com/)",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/geon/mem/issues"
+	},
+	"homepage": "https://github.com/geon/mem",
+	"devDependencies": {
+		"ts-node": "^7.0.1",
+		"typescript": "^3.0.3"
+	},
+	"prettier": {
+		"useTabs": true,
+		"trailingComma": "all"
+	},
+	"dependencies": {}
+}
