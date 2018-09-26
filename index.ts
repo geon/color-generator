@@ -29,41 +29,20 @@ function edgesInTetrahedron(tetrahedron: Tetrahedron): ReadonlyArray<Edge> {
 	return edges;
 }
 
-function edgeLength(edge: Edge): number {
-	const r = edge.a.r - edge.b.r;
-	const g = edge.a.g - edge.b.g;
-	const b = edge.a.b - edge.b.b;
-	return Math.sqrt(r * r + g * g + b * b);
-}
-
-function edgeLengthSquared(edge: Edge): number {
-	const r = edge.a.r - edge.b.r;
-	const g = edge.a.g - edge.b.g;
-	const b = edge.a.b - edge.b.b;
-	return r * r + g * g + b * b;
-}
-
-function interpolate(edge: Edge, factor: number): Color {
+function interpolate(a: Color, b: Color, factor: number): Color {
 	const factor2 = 1 - factor;
 	return {
-		r: edge.a.r * factor + edge.b.r * factor2,
-		g: edge.a.g * factor + edge.b.g * factor2,
-		b: edge.a.b * factor + edge.b.b * factor2,
+		r: a.r * factor + b.r * factor2,
+		g: a.g * factor + b.g * factor2,
+		b: a.b * factor + b.b * factor2,
 	};
 }
 
-function offCenterPoint(edge: Edge): Color {
-	return interpolate(edge, 0.55);
-}
-
-function edgesEqual(a: Edge, b: Edge): boolean {
-	return (a.a == b.a && a.b == b.b) || (a.a == b.b && a.b == b.a);
-}
-
-function tetrahedronHasEdge(tetrahedron: Tetrahedron, edge: Edge): boolean {
-	return edgesInTetrahedron(tetrahedron).some(edgeInTetrahedron =>
-		edgesEqual(edgeInTetrahedron, edge),
-	);
+function offCenterPoint(tetrahedron: Tetrahedron): Color {
+	const offCenter = 0.65;
+	const a = interpolate(tetrahedron.a, tetrahedron.b, offCenter);
+	const b = interpolate(tetrahedron.c, tetrahedron.d, offCenter);
+	return interpolate(a, b, offCenter);
 }
 
 function nameOfCorner(
@@ -83,46 +62,22 @@ function nameOfCorner(
 
 function splitTetrahedron(
 	tetrahedron: Tetrahedron,
-	edge: Edge,
-	newPoint: { point?: Color },
-): ReadonlyArray<Tetrahedron> {
-	if (!newPoint.point) {
-		newPoint.point = offCenterPoint(edge);
-	}
+): { newTetrahedrons: ReadonlyArray<Tetrahedron>; newPoint: Color } {
+	const newPoint = offCenterPoint(tetrahedron);
 
 	const a = { ...tetrahedron };
 	const b = { ...tetrahedron };
+	const c = { ...tetrahedron };
+	const d = { ...tetrahedron };
 
-	a[nameOfCorner(a, edge.a)!] = newPoint.point;
-	b[nameOfCorner(b, edge.b)!] = newPoint.point;
-
-	return [a, b];
-}
-
-function splitEdge(
-	edge: Edge,
-	tetrahedrons: ReadonlyArray<Tetrahedron>,
-): { newTetrahedrons: ReadonlyArray<Tetrahedron>; newPoint: Color } {
-	const affectedTetrahedrons = tetrahedrons.filter(tetrahedron =>
-		tetrahedronHasEdge(tetrahedron, edge),
-	);
-
-	const unAffectedTetrahedrons = tetrahedrons.filter(
-		tetrahedron => !tetrahedronHasEdge(tetrahedron, edge),
-	);
-
-	let newPoint: { point: Color | undefined } = { point: undefined };
+	a[nameOfCorner(a, tetrahedron.a)!] = newPoint;
+	b[nameOfCorner(b, tetrahedron.b)!] = newPoint;
+	c[nameOfCorner(c, tetrahedron.c)!] = newPoint;
+	d[nameOfCorner(d, tetrahedron.d)!] = newPoint;
 
 	return {
-		newTetrahedrons: [
-			...unAffectedTetrahedrons,
-			...affectedTetrahedrons
-				.map(affectedTetrahedron =>
-					splitTetrahedron(affectedTetrahedron, edge, newPoint),
-				)
-				.reduce((soFar, current) => [...soFar, ...current], []),
-		],
-		newPoint: newPoint.point!,
+		newTetrahedrons: [a, b, c, d],
+		newPoint,
 	};
 }
 
@@ -139,19 +94,52 @@ function findMax<T>(
 	return max;
 }
 
+function subColor(a: Color, b: Color) {
+	return {
+		r: a.r - b.r,
+		g: a.g - b.g,
+		b: a.b - b.b,
+	};
+}
+
+// https://en.wikipedia.org/wiki/Tetrahedron#Volume
+function tetrahedronVolume(tetrahedron: Tetrahedron) {
+	const A = subColor(tetrahedron.a, tetrahedron.d);
+	const B = subColor(tetrahedron.b, tetrahedron.d);
+	const C = subColor(tetrahedron.c, tetrahedron.d);
+
+	// https://en.wikipedia.org/wiki/Determinant
+	const determinant =
+		A.r * B.g * C.b +
+		A.g * B.b * C.r +
+		A.b * B.r * C.g -
+		A.b * B.g * C.r -
+		A.g * B.r * C.b -
+		A.r * B.b * C.g;
+
+	return determinant / 6;
+}
+
 function addPoint(
 	tetrahedrons: ReadonlyArray<Tetrahedron>,
 ): { newTetrahedrons: ReadonlyArray<Tetrahedron>; newPoint: Color } {
-	const allEdges = tetrahedrons
-		.map(edgesInTetrahedron)
-		.reduce((soFar, current) => [...soFar, ...current], []);
-
-	const longestEdge = findMax(
-		allEdges,
-		(a, b) => edgeLengthSquared(a) > edgeLengthSquared(b),
+	const largestTetrahedron = findMax(
+		tetrahedrons,
+		(a, b) => tetrahedronVolume(a) > tetrahedronVolume(b),
 	);
 
-	return splitEdge(longestEdge, tetrahedrons);
+	let { newTetrahedrons: splitTetrahedrons, newPoint } = splitTetrahedron(
+		largestTetrahedron,
+	);
+
+	const newTetrahedrons = [...tetrahedrons];
+	newTetrahedrons.splice(
+		tetrahedrons.indexOf(largestTetrahedron),
+		1,
+		...splitTetrahedrons,
+	);
+
+	return { newTetrahedrons, newPoint };
 }
 
 function* makeColorSeries(): IterableIterator<Color> {
