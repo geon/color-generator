@@ -84,22 +84,25 @@ function subColor(a: Color, b: Color) {
 	};
 }
 
+function colorDot(a: Color, b: Color) {
+	return a.r * b.r + a.g * b.g + a.b * b.b;
+}
+
+function colorCross(a: Color, b: Color): Color {
+	return {
+		r: a.g * b.b - a.b * b.g,
+		g: a.b * b.r - a.r * b.b,
+		b: a.r * b.g - a.g * b.r,
+	};
+}
+
 // https://en.wikipedia.org/wiki/Tetrahedron#Volume
 function tetrahedronVolume(tetrahedron: Tetrahedron) {
 	const A = subColor(tetrahedron.a, tetrahedron.d);
 	const B = subColor(tetrahedron.b, tetrahedron.d);
 	const C = subColor(tetrahedron.c, tetrahedron.d);
 
-	// https://en.wikipedia.org/wiki/Determinant
-	const determinant =
-		A.r * B.g * C.b +
-		A.g * B.b * C.r +
-		A.b * B.r * C.g -
-		A.b * B.g * C.r -
-		A.g * B.r * C.b -
-		A.r * B.b * C.g;
-
-	return determinant / 6;
+	return Math.abs(colorDot(A, colorCross(B, C))) / 6;
 }
 
 function addPoint(
