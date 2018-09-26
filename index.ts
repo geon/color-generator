@@ -144,8 +144,11 @@ function addPoint(
 
 function* makeColorSeries(): IterableIterator<Color> {
 	const white: Color = { r: 1, g: 1, b: 1 };
-	const gray: Color = { r: 0.5, g: 0.5, b: 0.5 };
+	// const gray: Color = { r: 0.5, g: 0.5, b: 0.5 };
+	// Gray is offset from the center, to make all initial tetrahedrons diffrent sizes, and hence deterministic.
+	const gray: Color = { r: 0.4, g: 0.6, b: 0.45 };
 	const black: Color = { r: 0, g: 0, b: 0 };
+
 	const red: Color = { r: 1, g: 0, b: 0 };
 	const magenta: Color = { r: 1, g: 0, b: 1 };
 	const blue: Color = { r: 0, g: 0, b: 1 };
@@ -228,15 +231,16 @@ function* makeColorSeries(): IterableIterator<Color> {
 		},
 	];
 
+	// We could yield the primary colors too, but they are ugly.
 	// yield white;
 	// yield gray;
 	// yield black;
-	yield red;
-	yield magenta;
-	yield blue;
-	yield cyan;
-	yield green;
-	yield yellow;
+	// yield red;
+	// yield cyan;
+	// yield magenta;
+	// yield green;
+	// yield blue;
+	// yield yellow;
 
 	for (;;) {
 		const { newTetrahedrons, newPoint } = addPoint(tetrahedrons);
