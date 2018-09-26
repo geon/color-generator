@@ -131,7 +131,7 @@ function* makeColorSeries(): IterableIterator<Color> {
 	const white: Color = { r: 1, g: 1, b: 1 };
 	// const gray: Color = { r: 0.5, g: 0.5, b: 0.5 };
 	// Gray is offset from the center, to make all initial tetrahedrons diffrent sizes, and hence deterministic.
-	const gray: Color = { r: 0.4, g: 0.6, b: 0.45 };
+	const gray: Color = { r: 0.45, g: 0.55, b: 0.5 };
 	const black: Color = { r: 0, g: 0, b: 0 };
 
 	const red: Color = { r: 1, g: 0, b: 0 };
