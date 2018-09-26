@@ -263,7 +263,14 @@ function rgbToHex(color: Color): string {
 	);
 }
 
+console.log("* {");
 const colorGenerator = makeColorSeries();
+let num = 0;
 for (const color of colorGenerator) {
-	console.log(rgbToHex(color));
+	console.log("color: " + rgbToHex(color) + ";");
+	++num;
+	if (num >= 100) {
+		break;
+	}
 }
+console.log("}");
