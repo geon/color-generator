@@ -20,11 +20,11 @@ function interpolate(a: Color, b: Color, factor: number): Color {
 	};
 }
 
-function offCenterPoint(tetrahedron: Tetrahedron): Color {
-	const offCenter = 0.65;
-	const a = interpolate(tetrahedron.a, tetrahedron.b, offCenter);
-	const b = interpolate(tetrahedron.c, tetrahedron.d, offCenter);
-	return interpolate(a, b, offCenter);
+function centerPoint(tetrahedron: Tetrahedron): Color {
+	const center = 0.5;
+	const a = interpolate(tetrahedron.a, tetrahedron.b, center);
+	const b = interpolate(tetrahedron.c, tetrahedron.d, center);
+	return interpolate(a, b, center);
 }
 
 function nameOfCorner(
@@ -45,7 +45,7 @@ function nameOfCorner(
 function splitTetrahedron(
 	tetrahedron: Tetrahedron,
 ): { newTetrahedrons: ReadonlyArray<Tetrahedron>; newPoint: Color } {
-	const newPoint = offCenterPoint(tetrahedron);
+	const newPoint = centerPoint(tetrahedron);
 
 	const a = { ...tetrahedron };
 	const b = { ...tetrahedron };
