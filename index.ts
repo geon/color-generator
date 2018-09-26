@@ -4,29 +4,11 @@ interface Color {
 	b: number;
 }
 
-interface Edge {
-	a: Color;
-	b: Color;
-}
-
 interface Tetrahedron {
 	a: Color;
 	b: Color;
 	c: Color;
 	d: Color;
-}
-
-function edgesInTetrahedron(tetrahedron: Tetrahedron): ReadonlyArray<Edge> {
-	const edges: ReadonlyArray<Edge> = [
-		{ a: tetrahedron.a, b: tetrahedron.b },
-		{ a: tetrahedron.a, b: tetrahedron.c },
-		{ a: tetrahedron.a, b: tetrahedron.d },
-		{ a: tetrahedron.b, b: tetrahedron.c },
-		{ a: tetrahedron.b, b: tetrahedron.d },
-		{ a: tetrahedron.c, b: tetrahedron.d },
-	];
-
-	return edges;
 }
 
 function interpolate(a: Color, b: Color, factor: number): Color {
