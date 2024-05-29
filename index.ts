@@ -42,6 +42,7 @@ function nameOfCorner(
 	return undefined;
 }
 
+// TODO. Bad idea. Creates increasingly flat tetrahedrons. Instead, find the longest edge and insert the point there and split all touched tetrahedrons in half.
 function splitTetrahedron(
 	tetrahedron: Tetrahedron,
 ): { newTetrahedrons: ReadonlyArray<Tetrahedron>; newPoint: Color } {
